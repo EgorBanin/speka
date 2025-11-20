@@ -1,0 +1,28 @@
+{
+    name: "profile",
+    desc: "Сервис управления профилями пользователей.",
+    methods: {
+        "/get": {
+            rq: {
+                "account_ids": ["688c79ae3b41110007ae4b14"]
+            },
+            rs: {
+                "profiles": [{
+                    "id": "C39836F0-7C5A-4C4A-970D-35F61C3256A8",
+                    "account_id": "688c79ae3b41110007ae4b14",
+                    "first_name": "Георгий",
+                    "last_name": "Банин",
+                    "time_zone": "Europe/Moscow",
+                    "gender": "m|f",
+                    "birth_date": "1985-05-20",
+                    "created_at": "2025-01-01T00:00:00+00:00",
+                    "updated_at": "2025-01-01T00:00:00+00:00",
+
+                }]
+            },
+            errors: [
+                "NOT_FOUND"
+            ]
+        }
+    }
+}

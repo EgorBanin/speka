@@ -10,6 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var pckg string
+
+func init() {
+	rootCmd.AddCommand(goStruct)
+	rootCmd.PersistentFlags().StringVar(&pckg, "package", "", "package name")
+}
+
 var goStruct = &cobra.Command{
 	Use: "gostruct",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -23,7 +30,12 @@ var goStruct = &cobra.Command{
 			return fmt.Errorf("hjson.Unmarshal: %w", err)
 		}
 
-		gen := generator.NewGoStruct(s.Name)
+		p := s.Name
+		if pckg != "" {
+			p = pckg
+		}
+
+		gen := generator.NewGoStruct(p)
 		for name, m := range s.Methods {
 			p, err := speka.ParseProperty(fmt.Sprintf("%s_rq", name), m.Rq)
 			if err != nil {
@@ -48,8 +60,4 @@ var goStruct = &cobra.Command{
 
 		return nil
 	},
-}
-
-func init() {
-	rootCmd.AddCommand(goStruct)
 }

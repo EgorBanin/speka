@@ -20,6 +20,10 @@ type goStructField struct {
 	validator string
 }
 
+type GoStructOpts struct {
+	Validator bool
+}
+
 type GoStruct struct {
 	pckg  string
 	types []goStruct
@@ -31,8 +35,8 @@ func NewGoStruct(pckg string) *GoStruct {
 	}
 }
 
-func (g *GoStruct) Generate(p *speka.Property, w io.Writer) error {
-	g.collectStructs(p)
+func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) error {
+	g.collectStructs(p, "", opts)
 	fmt.Fprintf(w, "package %s\n\n", g.pckg)
 	for _, t := range g.types {
 		fmt.Fprintf(w, "type %s struct {\n", t.name)
@@ -45,11 +49,12 @@ func (g *GoStruct) Generate(p *speka.Property, w io.Writer) error {
 	return nil
 }
 
-func (g *GoStruct) collectStructs(p *speka.Property) error {
+func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoStructOpts) error {
 	if p.Kind != speka.KindObject {
 		return nil
 	}
 
+	p.Name = fmt.Sprintf("%s%s", namePrefix, p.Name)
 	st := goStruct{
 		name:   camelCase(p.Name),
 		fields: make([]goStructField, 0, len(p.Properties)),
@@ -58,16 +63,23 @@ func (g *GoStruct) collectStructs(p *speka.Property) error {
 	for _, pp := range p.Properties {
 		switch pp.Kind {
 		case speka.KindObject:
-			g.collectStructs(pp)
+			g.collectStructs(pp, p.Name, opts)
 		case speka.KindArray:
-			g.collectStructs(pp.Items)
+			g.collectStructs(pp.Items, p.Name, opts)
 		}
 
 		var validator string
 		rules := make([]string, 0)
-		if pp.Required {
-			rules = append(rules, "required")
+		if opts.Validator {
+			if pp.Required {
+				rules = append(rules, "required")
+			}
+
+			if len(pp.Enum) > 0 {
+				rules = append(rules, fmt.Sprintf("oneof=%s", strings.Join(pp.Enum, " ")))
+			}
 		}
+
 		if len(rules) > 0 {
 			validator = fmt.Sprintf(" validate:\"%s\"", strings.Join(rules, ","))
 		}

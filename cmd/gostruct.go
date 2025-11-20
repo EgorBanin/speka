@@ -30,7 +30,9 @@ var goStruct = &cobra.Command{
 				return fmt.Errorf("speka.ParseProperty: %w", err)
 			}
 
-			if err := gen.Generate(p, os.Stdout); err != nil {
+			if err := gen.Generate(p, os.Stdout, generator.GoStructOpts{
+				Validator: true,
+			}); err != nil {
 				return fmt.Errorf("gen.Generate: %w", err)
 			}
 
@@ -39,7 +41,7 @@ var goStruct = &cobra.Command{
 				return fmt.Errorf("speka.ParseProperty: %w", err)
 			}
 
-			if err := gen.Generate(p, os.Stdout); err != nil {
+			if err := gen.Generate(p, os.Stdout, generator.GoStructOpts{}); err != nil {
 				return fmt.Errorf("gen.Generate: %w", err)
 			}
 		}

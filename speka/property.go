@@ -35,7 +35,7 @@ type Property struct {
 
 func ParseProperty(name string, data any) (*Property, error) {
 	p := new(Property)
-	if strings.HasSuffix(name, "?") {
+	if strings.HasSuffix(name, markNullable) {
 		p.Name = name[:len(name)-1]
 	} else {
 		p.Name = name

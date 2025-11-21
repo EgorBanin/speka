@@ -1,4 +1,4 @@
-module github.com/egorbanin/spekaspeka
+module github.com/egorbanin/speka
 
 go 1.25.3
 

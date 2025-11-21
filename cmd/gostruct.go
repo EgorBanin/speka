@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/egorbanin/speka/speka"
+	"github.com/egorbanin/speka/speka/generator"
 	"os"
-	"speka/speka"
-	"speka/speka/generator"
 
 	"github.com/hjson/hjson-go/v4"
 	"github.com/spf13/cobra"

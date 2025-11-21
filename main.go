@@ -1,7 +1,7 @@
 package main
 
 import (
-	"speka/cmd"
+	"github.com/egorbanin/speka/cmd"
 )
 
 func main() {

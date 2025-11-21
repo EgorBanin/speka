@@ -2,9 +2,9 @@ package generator
 
 import (
 	"fmt"
+	"github.com/egorbanin/speka/speka"
 	"io"
 	"regexp"
-	"speka/speka"
 	"strings"
 )
 

@@ -35,9 +35,12 @@ func NewGoStruct(pckg string) *GoStruct {
 	}
 }
 
+func (g *GoStruct) Package(w io.Writer) {
+	fmt.Fprintf(w, "package %s\n\n", g.pckg)
+}
+
 func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) error {
 	g.collectStructs(p, "", opts)
-	fmt.Fprintf(w, "package %s\n\n", g.pckg)
 	for _, t := range g.types {
 		fmt.Fprintf(w, "type %s struct {\n", t.name)
 		for _, f := range t.fields {
@@ -45,6 +48,7 @@ func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) e
 		}
 		fmt.Fprint(w, "}\n\n")
 	}
+	g.types = nil
 
 	return nil
 }

@@ -58,7 +58,7 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 		return nil
 	}
 
-	p.Name = fmt.Sprintf("%s%s", namePrefix, p.Name)
+	p.Name = fmt.Sprintf("%s_%s", namePrefix, p.Name)
 	st := goStruct{
 		name:   camelCase(p.Name),
 		fields: make([]goStructField, 0, len(p.Properties)),

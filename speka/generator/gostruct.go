@@ -26,17 +26,19 @@ type GoStructOpts struct {
 
 type GoStruct struct {
 	pckg  string
+	file  string
 	types []goStruct
 }
 
-func NewGoStruct(pckg string) *GoStruct {
+func NewGoStruct(pckg, file string) *GoStruct {
 	return &GoStruct{
 		pckg: pckg,
+		file: file,
 	}
 }
 
-func (g *GoStruct) Package(w io.Writer) {
-	fmt.Fprintf(w, "package %s\n\n", g.pckg)
+func (g *GoStruct) Head(w io.Writer) {
+	fmt.Fprintf(w, "package %s\n\n// generated from %s\n\n", g.pckg, g.file)
 }
 
 func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) error {

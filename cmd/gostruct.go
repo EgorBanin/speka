@@ -35,8 +35,8 @@ var goStruct = &cobra.Command{
 			p = pckg
 		}
 
-		gen := generator.NewGoStruct(p)
-		gen.Package(os.Stdout)
+		gen := generator.NewGoStruct(p, path)
+		gen.Head(os.Stdout)
 		for name, m := range s.Methods {
 			p, err := speka.ParseProperty(fmt.Sprintf("%s_rq", name), m.Rq)
 			if err != nil {

@@ -15,6 +15,7 @@ const (
 	KindString  = "string"
 	KindNumber  = "number"
 	KindInteger = "integer"
+	KindBoolean = "boolean"
 
 	FormatDate     = "date"
 	FormatDateTime = "date-time"
@@ -87,6 +88,8 @@ func ParseProperty(name string, data any) (*Property, error) {
 		if d == math.Trunc(d) {
 			p.Kind = KindInteger
 		}
+	case bool:
+		p.Kind = KindBoolean
 	default:
 		return nil, fmt.Errorf("can't parse %T", data)
 	}

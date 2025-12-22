@@ -130,6 +130,8 @@ func getType(p *speka.Property) string {
 		t = "int"
 	case speka.KindNumber:
 		t = "float64"
+	case speka.KindBoolean:
+		t = "bool"
 	case speka.KindArray:
 		t = fmt.Sprintf("[]%s", getType(p.Items))
 	}

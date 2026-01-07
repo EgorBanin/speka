@@ -8,6 +8,6 @@ type Speka struct {
 }
 
 type Method struct {
-	Rq *hjson.OrderedMap `json:"rq"`
-	Rs *hjson.OrderedMap `json:"rs"`
+	Rq *hjson.Node `json:"rq"`
+	Rs *hjson.Node `json:"rs"`
 }

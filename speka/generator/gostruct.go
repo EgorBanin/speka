@@ -10,6 +10,7 @@ import (
 
 type goStruct struct {
 	name   string
+	t      string
 	fields []goStructField
 }
 
@@ -44,6 +45,11 @@ func (g *GoStruct) Head(w io.Writer) {
 func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) error {
 	g.collectStructs(p, "", opts)
 	for _, t := range g.types {
+		if t.t != "" {
+			fmt.Fprintf(w, "type %s %s\n", t.name, t.t)
+			continue
+		}
+
 		fmt.Fprintf(w, "type %s struct {\n", t.name)
 		for _, f := range t.fields {
 			fmt.Fprintf(w, "\t%s %s `json:\"%s\"%s`\n", f.name, f.t, f.jsonName, f.validator)
@@ -56,6 +62,16 @@ func (g *GoStruct) Generate(p *speka.Property, w io.Writer, opts GoStructOpts) e
 }
 
 func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoStructOpts) error {
+	if p.Kind == speka.KindArray {
+		g.types = append(g.types, goStruct{
+			name:   camelCase(p.Name),
+			t:      fmt.Sprintf("[]%s", camelCase(fmt.Sprintf("%sItem", p.Name))),
+			fields: []goStructField{},
+		})
+		p.Items.Name = "item"
+		g.collectStructs(p.Items, p.Name, opts)
+	}
+
 	if p.Kind != speka.KindObject {
 		return nil
 	}

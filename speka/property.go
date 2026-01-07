@@ -43,6 +43,12 @@ func ParseProperty(name string, data any) (*Property, error) {
 		p.Required = true
 	}
 	switch d := data.(type) {
+	case *hjson.Node:
+		var err error
+		p, err = ParseProperty(name, d.Value)
+		if err != nil {
+			return nil, err
+		}
 	case *hjson.OrderedMap:
 		p.Kind = KindObject
 		p.Properties = make([]*Property, 0, d.Len())
@@ -57,7 +63,7 @@ func ParseProperty(name string, data any) (*Property, error) {
 	case []any:
 		p.Kind = KindArray
 		if len(d) > 0 {
-			items, err := ParseProperty(p.Name, d[0])
+			items, err := ParseProperty(fmt.Sprintf("%sItem", p.Name), d[0])
 			if err != nil {
 				return nil, err
 			}

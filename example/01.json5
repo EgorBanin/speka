@@ -23,6 +23,12 @@
             errors: [
                 "NOT_FOUND"
             ]
+        },
+        "/test": {
+            rq: "hi",
+            rs: [{
+                "x": "yz"
+            }]
         }
     }
 }

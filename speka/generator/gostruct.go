@@ -102,7 +102,7 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 			}
 
 			if pp.Kind == speka.KindArray {
-				rules = append(rules, "dive")
+				rules = append(rules, "dive", "required")
 			}
 		}
 

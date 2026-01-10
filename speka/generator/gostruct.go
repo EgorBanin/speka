@@ -100,6 +100,10 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 			if len(pp.Enum) > 0 {
 				rules = append(rules, fmt.Sprintf("oneof=%s", strings.Join(pp.Enum, " ")))
 			}
+
+			if pp.Kind == speka.KindArray {
+				rules = append(rules, "dive")
+			}
 		}
 
 		if len(rules) > 0 {

@@ -95,6 +95,8 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 		if opts.Validator {
 			if pp.Required {
 				rules = append(rules, "required")
+			} else {
+				rules = append(rules, "omitempty")
 			}
 
 			if len(pp.Enum) > 0 {

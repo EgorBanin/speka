@@ -2,10 +2,11 @@ package generator
 
 import (
 	"fmt"
-	"github.com/egorbanin/speka/speka"
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/egorbanin/speka/speka"
 )
 
 type goStruct struct {
@@ -105,6 +106,13 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 
 			if pp.Kind == speka.KindArray {
 				rules = append(rules, "dive", "required")
+			}
+
+			switch pp.Format {
+			case speka.FormatDate:
+				rules = append(rules, "datetime=2006-01-02")
+			case speka.FormatDateTime:
+				rules = append(rules, "datetime=2006-01-02T15:04:05Z07:00")
 			}
 		}
 

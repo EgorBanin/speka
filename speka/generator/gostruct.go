@@ -77,6 +77,10 @@ func (g *GoStruct) collectStructs(p *speka.Property, namePrefix string, opts GoS
 		return nil
 	}
 
+	if len(p.Properties) == 0 {
+		return nil
+	}
+
 	p.Name = fmt.Sprintf("%s_%s", namePrefix, p.Name)
 	st := goStruct{
 		name:   camelCase(p.Name),
@@ -153,7 +157,11 @@ func getType(p *speka.Property) string {
 	t := "any"
 	switch p.Kind {
 	case speka.KindObject:
-		t = camelCase(p.Name)
+		if len(p.Properties) == 0 {
+			t = "[]byte"
+		} else {
+			t = camelCase(p.Name)
+		}
 	case speka.KindString:
 		t = "string"
 	case speka.KindInteger:

@@ -63,7 +63,7 @@ func ParseProperty(name string, data any) (*Property, error) {
 	case []any:
 		p.Kind = KindArray
 		if len(d) > 0 {
-			items, err := ParseProperty(fmt.Sprintf("%sItem", p.Name), d[0])
+			items, err := ParseProperty(fmt.Sprintf("%s_item", p.Name), d[0])
 			if err != nil {
 				return nil, err
 			}

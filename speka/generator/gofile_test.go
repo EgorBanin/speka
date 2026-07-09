@@ -14,7 +14,7 @@ func TestGoFile_AddProperty(t *testing.T) {
 		},
 	})
 
-	f := NewGoFile("test", "test")
+	f := NewGoFile("test", "test", "test")
 	err := f.AddProperty(p, GoStructOpts{})
 
 	assert.NoError(t, err)

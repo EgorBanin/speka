@@ -16,18 +16,20 @@ const (
 )
 
 type GoFile struct {
-	name        string
-	packageName string
-	imports     []string
-	types       []*goStruct
+	name             string
+	generatedComment string
+	packageName      string
+	imports          []string
+	types            []*goStruct
 }
 
-func NewGoFile(name, packageName string) *GoFile {
+func NewGoFile(name, generatedComment, packageName string) *GoFile {
 	return &GoFile{
-		name:        name,
-		packageName: packageName,
-		imports:     make([]string, 0),
-		types:       make([]*goStruct, 0),
+		name:             name,
+		generatedComment: generatedComment,
+		packageName:      packageName,
+		imports:          make([]string, 0),
+		types:            make([]*goStruct, 0),
 	}
 }
 
@@ -43,7 +45,7 @@ func (f *GoFile) AddProperty(p *speka.Property, opts GoStructOpts) error {
 }
 
 func (f *GoFile) Write(w io.Writer) {
-	fmt.Fprintf(w, "package %s\n\n", f.packageName)
+	fmt.Fprintf(w, "// %s\npackage %s\n\n", f.generatedComment, f.packageName)
 
 	if len(f.imports) > 0 {
 		fmt.Fprintf(w, "import (\n\t\"%s\"\n)\n\n", strings.Join(f.imports, "\n\t"))
@@ -60,7 +62,7 @@ func (f *GoFile) Write(w io.Writer) {
 		fmt.Fprintln(w, "{")
 
 		for _, f := range t.fields {
-			fmt.Fprintf(w, "\t%s %s\n", f.name, f.t)
+			fmt.Fprintf(w, "\t%s %s `json:\"%s\"%s`\n", f.name, f.t, f.jsonName, f.validator)
 		}
 
 		fmt.Fprintln(w, "}", "")

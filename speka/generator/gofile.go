@@ -46,7 +46,7 @@ func (f *GoFile) Write(w io.Writer) {
 	fmt.Fprintf(w, "package %s\n\n", f.packageName)
 
 	if len(f.imports) > 0 {
-		fmt.Fprintf(w, "import (\n\t%s\n)\n\n", strings.Join(f.imports, "\n\t"))
+		fmt.Fprintf(w, "import (\n\t\"%s\"\n)\n\n", strings.Join(f.imports, "\n\t"))
 	}
 
 	for _, t := range f.types {

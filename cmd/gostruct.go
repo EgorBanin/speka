@@ -36,18 +36,17 @@ var goStruct = &cobra.Command{
 			p = pckg
 		}
 
-		gen := generator.NewGoStruct(p, path)
-		gen.Head(os.Stdout)
+		gen := generator.NewGoFile("", p)
 		for name, m := range s.Methods {
 			p, err := speka.ParseProperty(fmt.Sprintf("%s_rq", name), m.Rq)
 			if err != nil {
 				return fmt.Errorf("speka.ParseProperty: %w", err)
 			}
 
-			if err := gen.Generate(p, os.Stdout, generator.GoStructOpts{
+			if err := gen.AddProperty(p, generator.GoStructOpts{
 				Validator: true,
 			}); err != nil {
-				return fmt.Errorf("gen.Generate: %w", err)
+				return fmt.Errorf("gen.AddProperty: %w", err)
 			}
 
 			p, err = speka.ParseProperty(fmt.Sprintf("%s_rs", name), m.Rs)
@@ -55,10 +54,12 @@ var goStruct = &cobra.Command{
 				return fmt.Errorf("speka.ParseProperty: %w", err)
 			}
 
-			if err := gen.Generate(p, os.Stdout, generator.GoStructOpts{}); err != nil {
-				return fmt.Errorf("gen.Generate: %w", err)
+			if err := gen.AddProperty(p, generator.GoStructOpts{}); err != nil {
+				return fmt.Errorf("gen.AddProperty: %w", err)
 			}
 		}
+
+		gen.Write(os.Stdout)
 
 		return nil
 	},

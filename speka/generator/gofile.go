@@ -93,10 +93,6 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 		return s, nil
 	}
 
-	if len(p.Properties) == 0 {
-		return nil, nil
-	}
-
 	s := make([]*goStruct, 0, len(p.Properties))
 	for _, pp := range p.Properties {
 		ss, err := f.structs(pp, opts)
@@ -153,6 +149,8 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 	t := getType(p)
 	if t == typeJsonRawMessage {
 		f.addImport("encoding/json")
+
+		return nil, nil
 	}
 
 	s = append(s, &goStruct{

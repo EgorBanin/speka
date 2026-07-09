@@ -84,16 +84,20 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 		return nil, nil
 	}
 
+	var s []*goStruct
 	if p.Kind == speka.KindArray {
-		s, err := f.structs(p.Items, opts)
+		ss, err := f.structs(p.Items, opts)
 		if err != nil {
 			return nil, err
 		}
 
-		return s, nil
+		if ss == nil {
+			return nil, nil
+		}
+
+		s = append(s, ss...)
 	}
 
-	s := make([]*goStruct, 0, len(p.Properties))
 	for _, pp := range p.Properties {
 		ss, err := f.structs(pp, opts)
 		if err != nil {

@@ -15,8 +15,8 @@ import (
 var pckg string
 
 func init() {
+	goStruct.PersistentFlags().StringVar(&pckg, "package", "", "package name")
 	rootCmd.AddCommand(goStruct)
-	rootCmd.PersistentFlags().StringVar(&pckg, "package", "", "package name")
 }
 
 var goStruct = &cobra.Command{

@@ -1,0 +1,7 @@
+{{define "menu"}}
+    <ul>
+        {{range .}}
+            <li><a href="#{{.Link}}">{{.Text}}</a></li>
+        {{end}}
+    </ul>
+{{end}}

@@ -15,12 +15,12 @@ import (
 var pckg string
 
 func init() {
-	rootCmd.AddCommand(goStruct)
+	rootCmd.AddCommand(goStructs)
 	rootCmd.PersistentFlags().StringVar(&pckg, "package", "", "package name")
 }
 
-var goStruct = &cobra.Command{
-	Use: "gostruct",
+var goStructs = &cobra.Command{
+	Use: "go.structs",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b, err := os.ReadFile(path)
 		if err != nil {

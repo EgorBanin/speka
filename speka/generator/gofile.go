@@ -34,7 +34,7 @@ func NewGoFile(name, generatedComment, packageName string) *GoFile {
 }
 
 func (f *GoFile) AddProperty(p *speka.Property, opts GoStructOpts) error {
-	s, err := f.structs(p, opts)
+	s, err := f.structs(p, opts, false)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (f *GoFile) addImport(imports ...string) {
 	}
 }
 
-func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, error) {
+func (f *GoFile) structs(p *speka.Property, opts GoStructOpts, isProperty bool) ([]*goStruct, error) {
 	if p == nil {
 		return nil, nil
 	}
@@ -88,7 +88,7 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 
 	var s []*goStruct
 	if p.Kind == speka.KindArray {
-		ss, err := f.structs(p.Items, opts)
+		ss, err := f.structs(p.Items, opts, false)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 	}
 
 	for _, pp := range p.Properties {
-		ss, err := f.structs(pp, opts)
+		ss, err := f.structs(pp, opts, true)
 		if err != nil {
 			return nil, err
 		}
@@ -156,7 +156,9 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts) ([]*goStruct, err
 	if t == typeJsonRawMessage {
 		f.addImport("encoding/json")
 
-		return nil, nil
+		if isProperty {
+			return nil, nil
+		}
 	}
 
 	s = append(s, &goStruct{

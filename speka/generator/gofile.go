@@ -156,7 +156,12 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 		case typeStruct:
 			t = current.name + camelCase(pp.Name)
 		case typeSlice:
-			t = t + current.name + camelCase(pp.Name) + "Item"
+			tt := getType(pp.Items)
+			if tt == typeStruct {
+				t += current.name + camelCase(pp.Name) + camelCase(pp.Items.Name)
+			} else {
+				t += tt
+			}
 		}
 
 		current.fields = append(current.fields, goStructField{
@@ -231,6 +236,10 @@ func camelCase(s string) string {
 
 func getType(p *speka.Property) string {
 	t := "any"
+	if p == nil {
+		return t
+	}
+
 	switch p.Kind {
 	case speka.KindObject:
 		if len(p.Properties) == 0 {

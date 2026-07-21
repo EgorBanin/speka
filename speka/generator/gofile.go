@@ -12,6 +12,7 @@ import (
 
 const (
 	typeStruct         = "struct"
+	typeSlice          = "[]"
 	typeJsonRawMessage = "json.RawMessage"
 )
 
@@ -34,7 +35,7 @@ func NewGoFile(name, generatedComment, packageName string) *GoFile {
 }
 
 func (f *GoFile) AddProperty(p *speka.Property, opts GoStructOpts) error {
-	s, err := f.structs(p, opts, false)
+	s, err := f.structs(p, nil, opts)
 	if err != nil {
 		return err
 	}
@@ -59,7 +60,7 @@ func (f *GoFile) Write(w io.Writer) {
 			continue
 		}
 
-		fmt.Fprintln(w, "{")
+		fmt.Fprintln(w, " {")
 
 		for _, f := range t.fields {
 			fmt.Fprintf(w, "\t%s %s `json:\"%s\"%s`\n", f.name, f.t, f.jsonName, f.validator)
@@ -77,7 +78,7 @@ func (f *GoFile) addImport(imports ...string) {
 	}
 }
 
-func (f *GoFile) structs(p *speka.Property, opts GoStructOpts, isProperty bool) ([]*goStruct, error) {
+func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts) ([]*goStruct, error) {
 	if p == nil {
 		return nil, nil
 	}
@@ -86,29 +87,40 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts, isProperty bool) 
 		return nil, nil
 	}
 
-	var s []*goStruct
-	if p.Kind == speka.KindArray {
-		ss, err := f.structs(p.Items, opts, false)
-		if err != nil {
-			return nil, err
+	name := camelCase(p.Name)
+	if parent != nil {
+		name = parent.name + name
+	}
+
+	t := getType(p)
+	switch t {
+	case typeSlice:
+		if parent != nil {
+			t = t + parent.name
 		}
 
-		if ss == nil {
+		t = t + camelCase(p.Name)
+
+		if p.Items != nil {
+			t += camelCase(p.Items.Name)
+		} else {
+			t += "any"
+		}
+
+	case typeJsonRawMessage:
+		f.addImport("encoding/json")
+
+		if parent != nil {
 			return nil, nil
 		}
-
-		s = append(s, ss...)
 	}
 
-	for _, pp := range p.Properties {
-		ss, err := f.structs(pp, opts, true)
-		if err != nil {
-			return nil, err
-		}
-
-		s = append(s, ss...)
+	current := &goStruct{
+		name:   name,
+		t:      t,
+		fields: make([]goStructField, 0, len(p.Properties)),
 	}
-	fields := make([]goStructField, 0, len(p.Properties))
+
 	for _, pp := range p.Properties {
 		validator := ""
 		v := make([]string, 0)
@@ -140,11 +152,14 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts, isProperty bool) 
 		}
 
 		t := getType(pp)
-		if t == typeStruct {
-			t = camelCase(pp.Name)
+		switch t {
+		case typeStruct:
+			t = current.name + camelCase(pp.Name)
+		case typeSlice:
+			t = t + current.name + camelCase(pp.Name) + "Item"
 		}
 
-		fields = append(fields, goStructField{
+		current.fields = append(current.fields, goStructField{
 			name:      camelCase(pp.Name),
 			t:         t,
 			jsonName:  pp.Name,
@@ -152,20 +167,31 @@ func (f *GoFile) structs(p *speka.Property, opts GoStructOpts, isProperty bool) 
 		})
 	}
 
-	t := getType(p)
-	if t == typeJsonRawMessage {
-		f.addImport("encoding/json")
-
-		if isProperty {
-			return nil, nil
-		}
+	s := []*goStruct{
+		current,
 	}
 
-	s = append(s, &goStruct{
-		name:   camelCase(p.Name),
-		t:      t,
-		fields: fields,
-	})
+	if p.Kind == speka.KindArray {
+		if parent != nil {
+			s = []*goStruct{}
+		}
+
+		ss, err := f.structs(p.Items, current, opts)
+		if err != nil {
+			return nil, err
+		}
+
+		s = append(s, ss...)
+	}
+
+	for _, pp := range p.Properties {
+		ss, err := f.structs(pp, current, opts)
+		if err != nil {
+			return nil, err
+		}
+
+		s = append(s, ss...)
+	}
 
 	return s, nil
 }
@@ -221,15 +247,10 @@ func getType(p *speka.Property) string {
 	case speka.KindBoolean:
 		t = "bool"
 	case speka.KindArray:
-		tt := getType(p.Items)
-		if tt == typeStruct {
-			t = fmt.Sprintf("[]%s", camelCase(p.Items.Name))
-		} else {
-			t = fmt.Sprintf("[]%s", tt)
-		}
+		t = typeSlice
 	}
 
-	if !p.Required && p.Kind != speka.KindArray && t != typeJsonRawMessage {
+	if !p.Required && t != typeSlice && t != typeJsonRawMessage {
 		t = "*" + t
 	}
 

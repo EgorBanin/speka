@@ -108,11 +108,13 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 		}
 
 	case typeJsonRawMessage:
-		f.addImport("encoding/json")
-
 		if parent != nil {
+			f.addImport("encoding/json")
+
 			return nil, nil
 		}
+
+		t = "any"
 	}
 
 	current := &goStruct{

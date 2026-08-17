@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&path, "file", "speka.json5", "path to speka file")
+	rootCmd.PersistentFlags().StringVar(&path, "file", "", "path to speka file")
 }
 
 func Execute() {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -12,19 +13,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var pckg string
-
 func init() {
 	rootCmd.AddCommand(goStructs)
-	rootCmd.PersistentFlags().StringVar(&pckg, "package", "", "package name")
+	goStructs.Flags().String("package", "", "package")
 }
 
 var goStructs = &cobra.Command{
 	Use: "go.structs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		b, err := os.ReadFile(path)
+		pckg, err := cmd.Flags().GetString("package")
 		if err != nil {
-			return fmt.Errorf("os.ReadFile %s: %w", path, err)
+			return fmt.Errorf("cmd.Flags().GetString: %w", err)
+		}
+
+		var b []byte
+		if path != "" {
+			b, err = os.ReadFile(path)
+			if err != nil {
+				return fmt.Errorf("os.ReadFile %s: %w", path, err)
+			}
+		} else {
+			b, err = io.ReadAll(os.Stdin)
+			if err != nil {
+				return fmt.Errorf("io.ReadAll %s: %w", path, err)
+			}
 		}
 
 		var s speka.Speka

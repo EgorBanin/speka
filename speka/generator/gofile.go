@@ -53,9 +53,14 @@ func (f *GoFile) Write(w io.Writer) {
 	}
 
 	for _, t := range f.types {
-		fmt.Fprintf(w, "type %s %s", t.name, t.t)
+		tt := t.t
+		if strings.HasPrefix(tt, "*") {
+			tt = t.t[1:]
+		}
 
-		if t.t != typeStruct {
+		fmt.Fprintf(w, "type %s %s", t.name, tt)
+
+		if tt != typeStruct {
 			fmt.Fprintln(w)
 			continue
 		}
@@ -146,6 +151,8 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 				v = append(v, "datetime=2006-01-02")
 			case speka.FormatDateTime:
 				v = append(v, "datetime=2006-01-02T15:04:05Z07:00")
+			case speka.FormatEmail:
+				v = append(v, "email")
 			}
 		}
 
@@ -154,9 +161,14 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 		}
 
 		t := getType(pp)
+		asterisk := ""
+		if strings.HasPrefix(t, "*") {
+			t = t[1:]
+			asterisk = "*"
+		}
 		switch t {
 		case typeStruct:
-			t = current.name + camelCase(pp.Name)
+			t = asterisk + current.name + camelCase(pp.Name)
 		case typeSlice:
 			tt := getType(pp.Items)
 			if tt == typeStruct {

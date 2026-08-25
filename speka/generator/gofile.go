@@ -168,7 +168,7 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 		}
 		switch t {
 		case typeStruct:
-			t = asterisk + current.name + camelCase(pp.Name)
+			t = current.name + camelCase(pp.Name)
 		case typeSlice:
 			tt := getType(pp.Items)
 			if tt == typeStruct {
@@ -180,7 +180,7 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 
 		current.fields = append(current.fields, goStructField{
 			name:      camelCase(pp.Name),
-			t:         t,
+			t:         asterisk + t,
 			jsonName:  pp.Name,
 			validator: validator,
 		})

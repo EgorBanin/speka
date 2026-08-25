@@ -3,6 +3,7 @@ package speka
 import (
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,9 +20,12 @@ const (
 
 	FormatDate     = "date"
 	FormatDateTime = "date-time"
+	FormatEmail    = "email"
 
 	markNullable = "?"
 )
+
+var emailRegexp = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}$`)
 
 type Property struct {
 	Name       string
@@ -72,11 +76,16 @@ func ParseProperty(name string, data any) (*Property, error) {
 		}
 
 	case string:
+
 		p.Kind = KindString
-		if strings.Contains(d, "|") {
+		switch {
+		case strings.Contains(d, "|"):
 			p.Enum = strings.Split(d, "|")
 			p.Example = p.Enum[0]
-		} else {
+		case emailRegexp.MatchString(d):
+			p.Format = FormatEmail
+			p.Example = d
+		default:
 			_, err := time.Parse(time.DateOnly, d)
 			if err == nil {
 				p.Format = FormatDate

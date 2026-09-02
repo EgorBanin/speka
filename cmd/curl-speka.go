@@ -27,7 +27,7 @@ func init() {
 }
 
 var curlSpeka = &cobra.Command{
-	Use: "curl-speka",
+	Use: "curl",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		b, err := os.ReadFile(path)
 		if err != nil {
@@ -39,20 +39,22 @@ var curlSpeka = &cobra.Command{
 			return fmt.Errorf("hjson.Unmarshal: %w", err)
 		}
 
-		if _, ok := s.Methods[urlPath]; !ok {
-			return fmt.Errorf("urlPath %s not found", urlPath)
-		}
-
 		u, err := url.Parse(domain)
 		if err != nil {
 			return fmt.Errorf("url.Parse: %w", err)
 		}
 		u = u.JoinPath(urlPath)
 
-		strBuilder := &strings.Builder{}
-		fmt.Fprintf(strBuilder, "curl -X %s --location \"%s\" \\\n", defaultMethod, u.String())
-		fmt.Fprintf(strBuilder, "\t-H \"Content-Type: application/json\" \\\n")
-		fmt.Fprintf(strBuilder, "\t-d")
+		method, ok := s.Methods[urlPath]
+		if !ok {
+			return fmt.Errorf("urlPath %s not found", urlPath)
+		}
+		jsonRq, err := method.Rq.MarshalJSON()
+
+		var strBuilder strings.Builder
+		fmt.Fprintf(&strBuilder, "curl -X %s --location \"%s\" \\\n", defaultMethod, u.String())
+		fmt.Fprintf(&strBuilder, "\t-H \"Content-Type: application/json\" \\\n")
+		fmt.Fprintf(&strBuilder, "\t-d '%s'\n", string(jsonRq))
 
 		if _, err := fmt.Fprint(os.Stdout, strBuilder.String()); err != nil {
 			return err

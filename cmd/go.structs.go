@@ -68,7 +68,9 @@ var goStructs = &cobra.Command{
 				return fmt.Errorf("speka.ParseProperty: %w", err)
 			}
 
-			if err := gen.AddProperty(p, generator.GoStructOpts{}); err != nil {
+			if err := gen.AddProperty(p, generator.GoStructOpts{
+				Omitempty: true,
+			}); err != nil {
 				return fmt.Errorf("gen.AddProperty: %w", err)
 			}
 		}

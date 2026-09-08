@@ -178,10 +178,15 @@ func (f *GoFile) structs(p *speka.Property, parent *goStruct, opts GoStructOpts)
 			}
 		}
 
+		jsonName := pp.Name
+		if opts.Omitempty && asterisk == "*" {
+			jsonName = fmt.Sprintf("%s,omitempty", jsonName)
+		}
+
 		current.fields = append(current.fields, goStructField{
 			name:      camelCase(pp.Name),
 			t:         asterisk + t,
-			jsonName:  pp.Name,
+			jsonName:  jsonName,
 			validator: validator,
 		})
 	}
@@ -230,6 +235,7 @@ type goStructField struct {
 
 type GoStructOpts struct {
 	Validator bool
+	Omitempty bool
 }
 
 var splitRegex = regexp.MustCompile("[^a-zA-Z]+")

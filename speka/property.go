@@ -76,35 +76,35 @@ func ParseProperty(name string, data any) (*Property, error) {
 		}
 
 	case string:
-
 		p.Kind = KindString
+		p.Example = d
 		switch {
 		case strings.Contains(d, "|"):
 			p.Enum = strings.Split(d, "|")
 			p.Example = p.Enum[0]
 		case emailRegexp.MatchString(d):
 			p.Format = FormatEmail
-			p.Example = d
 		default:
 			_, err := time.Parse(time.DateOnly, d)
 			if err == nil {
 				p.Format = FormatDate
-				p.Example = d
 			}
 
 			_, err = time.Parse(time.RFC3339, d)
 			if err == nil {
 				p.Format = FormatDateTime
-				p.Example = d
 			}
 		}
 	case float64:
 		p.Kind = KindNumber
+		p.Example = d
 		if d == math.Trunc(d) {
 			p.Kind = KindInteger
+			p.Example = int(d)
 		}
 	case bool:
 		p.Kind = KindBoolean
+		p.Example = d
 	default:
 		return nil, fmt.Errorf("can't parse %T", data)
 	}

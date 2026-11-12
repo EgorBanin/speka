@@ -1,0 +1,11 @@
+{{define "menu"}}
+<nav class="menu">
+    {{if .Name}}<h1>{{.Name}}</h1>{{end}}
+    {{if .Desc}}<p class="speka-desc">{{.Desc}}</p>{{end}}
+    <ul>
+        {{range .Menu}}
+        <li><a href="#{{.Link}}">{{.Text}}</a></li>
+        {{end}}
+    </ul>
+</nav>
+{{end}}

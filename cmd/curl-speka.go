@@ -49,12 +49,12 @@ var curlSpeka = &cobra.Command{
 		}
 		u = u.JoinPath(urlPath)
 
-		strBuilder := strings.Builder{}
-		strBuilder.WriteString(fmt.Sprintf("curl -X %s --location \"%s\" \\\n", defaultMethod, u.String()))
-		strBuilder.WriteString(fmt.Sprintf("\t-H \"Content-Type: application/json\" \\\n"))
-		strBuilder.WriteString(fmt.Sprintf("\t-d"))
+		strBuilder := &strings.Builder{}
+		fmt.Fprintf(strBuilder, "curl -X %s --location \"%s\" \\\n", defaultMethod, u.String())
+		fmt.Fprintf(strBuilder, "\t-H \"Content-Type: application/json\" \\\n")
+		fmt.Fprintf(strBuilder, "\t-d")
 
-		if _, err := fmt.Fprintf(os.Stdout, strBuilder.String()); err != nil {
+		if _, err := fmt.Fprint(os.Stdout, strBuilder.String()); err != nil {
 			return err
 		}
 

@@ -1,0 +1,65 @@
+{{define "method"}}
+<section class="method" id="{{.ID}}">
+    <h2>{{.Name}}</h2>
+    {{if .Desc}}<p class="method-desc">{{.Desc}}</p>{{end}}
+    <div class="tabs">
+        <input class="tab-radio" type="radio" name="tabs-{{.ID}}" id="{{.ID}}-request" checked>
+        <input class="tab-radio" type="radio" name="tabs-{{.ID}}" id="{{.ID}}-response">
+        <input class="tab-radio" type="radio" name="tabs-{{.ID}}" id="{{.ID}}-errors">
+        <div class="tab-bar">
+            <label for="{{.ID}}-request">Request</label>
+            <label for="{{.ID}}-response">Response</label>
+            <label for="{{.ID}}-errors">Errors</label>
+        </div>
+        <div class="tab-panels">
+            <div class="tab-panel">
+                {{if .Params}}
+                    {{range .Params}}
+                        {{template "property" .}}
+                    {{end}}
+                {{else}}
+                    <div class="empty">No parameters</div>
+                {{end}}
+            </div>
+            <div class="tab-panel">
+                {{if .Response}}
+                    {{range .Response}}
+                        {{template "property" .}}
+                    {{end}}
+                {{else}}
+                    <div class="empty">No fields</div>
+                {{end}}
+            </div>
+            <div class="tab-panel">
+                {{if .Errors}}
+                    {{range .Errors}}
+                        <div class="error">{{.}}</div>
+                    {{end}}
+                {{else}}
+                    <div class="empty">No errors</div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}
+
+{{define "property"}}
+<div class="param">
+    <div class="param-name">
+        {{.Name}}{{if .Required}}<span class="param-required">*</span>{{end}}
+    </div>
+    <div class="param-kind">{{.Kind}}</div>
+    <div class="param-example">{{if .Example}}{{printf "%v" .Example}}{{end}}</div>
+    {{if or .Properties .Items}}
+    <div class="param-children">
+        {{range .Properties}}
+            {{template "property" .}}
+        {{end}}
+        {{if .Items}}
+            {{template "property" .Items}}
+        {{end}}
+    </div>
+    {{end}}
+</div>
+{{end}}

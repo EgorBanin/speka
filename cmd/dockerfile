@@ -1,0 +1,8 @@
+FROM alpine
+ARG pathToApp
+
+COPY $pathToApp /speka
+
+WORKDIR /speka
+
+ENTRYPOINT ["./speka"]
